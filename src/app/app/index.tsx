@@ -10,6 +10,8 @@ import { useSession } from '@/hooks/useSession';
 import styles from './app.module.css';
 import { cn } from '@/utils/tailwind';
 import { toast } from 'sonner';
+import MetricPanel from '@/features/graph/components/metric-panel';
+import Navbar from '@/components/navbar';
 
 const HIGH_LEVEL_CATEGORIES = [
   'Computer Science',
@@ -29,11 +31,6 @@ const INITIAL_NODES: Node[] = HIGH_LEVEL_CATEGORIES.map((name, idx) => ({
   depth: 0,
   type: "topic",
 }));
-
-const COLORS = [
-  '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4',
-  '#ffeaa7', '#dfe6e9', '#a29bfe', '#fd79a8'
-];
 
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
   ssr: false,
@@ -72,7 +69,6 @@ export default function AppView() {
   const [currentDepth, setCurrentDepth] = useState<number>(0);
   const [loading, setLoading] = useState<number | null>(null);
   const graphRef = useRef<any>(null);
-  const focusedNodeRef = useRef<Node | null>(null);
   const nextId = useRef(INITIAL_NODES.length);
   const imageCacheRef = useRef(new Map<string, HTMLImageElement | null>());
   const nodeStatesRef = useRef<Record<number, 'idle' | 'loading'>>({});
@@ -161,7 +157,6 @@ export default function AppView() {
         return;
       }
 
-      if (loading !== null) return;
 
       if (hasChildren(node.id)) {
         graphRef.current?.centerAt(node.x, node.y, 1000);
@@ -170,7 +165,6 @@ export default function AppView() {
 
       graphRef.current?.centerAt(node.x, node.y, 500);
 
-      setLoading(node.id);
       nodeStatesRef.current[node.id] = 'loading';
       setCurrentDepth(node.depth);
 
@@ -186,7 +180,6 @@ export default function AppView() {
         const errorText = await response.text();
         console.error("API error:", response.status, errorText);
         toast("Slow Down!!! You've been rate limited")
-        setLoading(null);
         nodeStatesRef.current[node.id] = 'idle';
         return;
       }
@@ -263,10 +256,9 @@ export default function AppView() {
           };
         });
       }
-      setLoading(null);
       nodeStatesRef.current[node.id] = 'idle';
     },
-    [data.links, loading],
+    [data.links],
   );
 
   const hasChildren = (nodeId: number): boolean => {
@@ -282,9 +274,10 @@ export default function AppView() {
   console.log(user.id);
 
   return (
-    <div className={cn("min-h-screen w-full", styles.root)}>
-      <Button onClick={handleGraphSave}>Upload graph data</Button>
-      <p>Current Depth: {currentDepth}</p>
+    <div className={cn("min-h-screen w-full flex flex-col", styles.root)}>
+      <Navbar />
+      <MetricPanel depthLevel={currentDepth}  />
+
       <ForceGraph2D
         ref={graphRef}
         graphData={data}
@@ -296,7 +289,7 @@ export default function AppView() {
         nodeCanvasObject={(node: any, ctx: any, globalScale: any) => {
           const label = node.name;
           const fontSize = 14 / globalScale;
-          ctx.font = `${fontSize}px Sans-Serif`;
+          ctx.font = `${fontSize}px JetBrains Mono`;
           const textWidth = ctx.measureText(label).width;
           const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
 
@@ -305,7 +298,7 @@ export default function AppView() {
           const nodeColor = isResource
             ? "oklch(0.7294 0.111 66.71)"
             : nodeStatesRef.current[node.id] === "loading"
-              ? '#ffd700' : hasChildren(node.id)
+              ? 'oklch(0.6765 0.0715 57.72)' : hasChildren(node.id)
                 ? "oklch(0.6941 0.1233 238.24)"
                 : "oklch(0.4176 0.0592 238.24)";
 

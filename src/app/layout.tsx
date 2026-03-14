@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist } from 'next/font/google'
+import { Geist, Barlow_Condensed, JetBrains_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import NextTopLoader from 'nextjs-toploader'
 import { Analytics } from '@vercel/analytics/react'
@@ -24,6 +24,19 @@ const geistSans = Geist({
   subsets: ['latin'],
 })
 
+const barlow = Barlow_Condensed({
+  variable: "--font-barlow",
+  weight: ["600", "700"],
+  display: 'swap',
+  subsets: ['latin'],
+});
+
+const jet = JetBrains_Mono({
+  variable: "--font-jet",
+  display: 'swap',
+  subsets: ['latin'],
+})
+
 type RootLayoutProps = {
   children: React.ReactNode
 }
@@ -31,7 +44,7 @@ type RootLayoutProps = {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${jet.variable} ${barlow.variable} ${geistSans.className}   antialiased`}>
         <NextTopLoader showSpinner={false} height={2} color="#2acf80" />
         <ThemeProvider
           attribute="class"
