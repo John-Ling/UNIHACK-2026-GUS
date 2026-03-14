@@ -89,7 +89,6 @@ export default function AppView() {
   const [interestsSelected, setInterestsSelected] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<InterestId[]>([]);
 
-
   const getInitialNodes = (): Node[] => {
     if (selectedInterests.length === 0) {
       return HIGH_LEVEL_CATEGORIES.map((name, idx) => ({
@@ -222,8 +221,6 @@ export default function AppView() {
         return;
       }
 
-
-
       graphRef.current?.centerAt(node.x, node.y, 500);
 
       nodeStatesRef.current[node.id] = 'loading';
@@ -250,7 +247,6 @@ export default function AppView() {
 
 
       if (result) {
-
         setData((prev) => {
           const existingTopicNames = new Set(
             prev.nodes
@@ -370,7 +366,7 @@ export default function AppView() {
   console.log(user.id);
 
   return (
-    <div className={cn("min-h-screen w-full flex flex-col", styles.root)}>
+    <div className={cn("min-h-screen w-full flex flex-col background-pattern")}>
       <div className="fixed top-0 left-0">
         <Navbar />
         <MetricPanel depthLevel={currentDepth} nodesExplored={nodesExplored}/>
@@ -510,7 +506,7 @@ export default function AppView() {
           ctx.fill();
         }}
         d3AlphaDecay={0.02} // default 0.0228, lower = longer simulation
-        d3VelocityDecay={0.7} // default 0.4, lower = nodes travel further
+        d3VelocityDecay={0.8} // default 0.4, lower = nodes travel further
         linkDirectionalArrowLength={0}
         linkDirectionalArrowRelPos={1}
         linkColor={() => "oklch(0.7176 0.0691 57.72)"}

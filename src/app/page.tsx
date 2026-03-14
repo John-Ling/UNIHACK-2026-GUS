@@ -30,113 +30,6 @@ export default function LandingPage() {
 
   /*
   =========================
-  Graph canvas animation
-  =========================
-  */
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-
-    const nodes: Node[] = [];
-    const nodeCount = 40;
-    const connectionDistance = 150;
-
-    for (let i = 0; i < nodeCount; i++) {
-      nodes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 3 + 2,
-      });
-    }
-
-    let mouseX = canvas.width / 2;
-    let mouseY = canvas.height / 2;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-
-    let animationId: number;
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      nodes.forEach((node) => {
-        node.x += node.vx;
-        node.y += node.vy;
-
-        if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
-        if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
-
-        const dx = mouseX - node.x;
-        const dy = mouseY - node.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 200) {
-          node.x += dx * 0.01;
-          node.y += dy * 0.01;
-        }
-      });
-
-      nodes.forEach((node, i) => {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const other = nodes[j];
-
-          const dx = other.x - node.x;
-          const dy = other.y - node.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < connectionDistance) {
-            const alpha = (1 - dist / connectionDistance) * 0.4;
-
-            ctx.beginPath();
-            ctx.strokeStyle = `oklch(0.53 0.16 254.20 / ${alpha})`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(other.x, other.y);
-            ctx.stroke();
-          }
-        }
-      });
-
-      nodes.forEach((node) => {
-        ctx.beginPath();
-        ctx.fillStyle = "oklch(0.53 0.16 254.20)";
-        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      animationId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(animationId);
-    };
-  }, []);
-
-  /*
-  =========================
   Scroll progress
   =========================
   */
@@ -229,8 +122,7 @@ export default function LandingPage() {
 
   return (
     <main
-      className="h-[300vh] w-full relative"
-      style={{ background: "oklch(0.23 0.07 254.08)" }}
+      className="h-[300vh] w-full relative background-pattern bg-background"
     >
       {/* Canvas */}
       <canvas
@@ -248,7 +140,6 @@ export default function LandingPage() {
           >
             <h1
               className="text-6xl font-barlow md:text-8xl font-bold mb-4"
-              style={{ color: "oklch(0.80 0.05 66.97)" }}
             >
               GRAPH SURF
             </h1>
@@ -258,8 +149,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-xl md:text-2xl mb-12 font-light font-jet"
-            style={{ color: "oklch(0.72 0.04 67.03)" }}
+            className="text-xl md:text-2xl mb-12 font-light font-geist"
           >
             novel, graph-based web exploration
           </motion.p>
