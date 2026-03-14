@@ -51,18 +51,34 @@ export default function AppView() {
       return;
     }
 
-    console.log("Loading data");
+    console.log("[LOG] Loading data");
     async function loadData() {
       const graph = await loadGraph(user!.id);
-      console.log("FOUND GRAPH ", graph)
-      console.log("FOUND GRAPH ", graph.graph_data)
-      if (graph.graph_data) {
+      if (graph && graph.graph_data) {
         setData(graph.graph_data);
+        // Sync nextId so new nodes don't collide with existing ones
+        const maxId = Math.max(...graph.graph_data.nodes.map((n: Node) => n.id));
+        nextId.current = maxId + 1;
       }
     }
       
     loadData(); 
   }, [user]);
+
+  async function handleGraphSave() {
+    // Strip position information
+    const sanitisedData = {
+      nodes: data.nodes.map(({ id, name, group }) => ({ id, name, group })),
+      links: data.links.map((link) => ({
+        source: (link.source as Node)?.id ?? link.source,
+        target: (link.target as Node)?.id ?? link.target,
+      })),
+    };
+
+    if (user) {
+      await upsertGraph(user.id, sanitisedData)
+    }
+  }
 
   const handleNodeClick = useCallback(async (node: any) => {
     if (loading !== null) return;
@@ -133,7 +149,7 @@ export default function AppView() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      <Button onClick={() => upsertGraph(user.id, data)}>Upload graph data</Button>
+      <Button onClick={handleGraphSave}>Upload graph data</Button>
       <ForceGraph2D
         ref={graphRef}
         graphData={data}
