@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Node {
   x: number;
@@ -16,6 +16,7 @@ export default function LandingPage() {
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -134,10 +135,19 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    if (scrollProgress >= 1) {
-      router.push("/app");
+    if (scrollProgress >= 1 && !isTransitioning) {
+      setIsTransitioning(true);
     }
-  }, [scrollProgress, router]);
+  }, [scrollProgress, isTransitioning]);
+
+  useEffect(() => {
+    if (isTransitioning) {
+      const timer = setTimeout(() => {
+        router.push("/app");
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isTransitioning, router]);
 
   return (
     <main
@@ -178,17 +188,32 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            className="flex flex-col items-center gap-3"
           >
             <span
-              className="inline-block px-10 py-4 text-lg font-medium rounded-full pointer-events-auto"
-              style={{
-                background: "oklch(0.53 0.16 254.20)",
-                color: "oklch(0.80 0.05 66.97)",
-                boxShadow: "0 0 40px oklch(0.53 0.16 254.20 / 0.3)",
-              }}
+              className="text-lg font-light"
+              style={{ color: "oklch(0.72 0.04 67.03 / 0.6)" }}
             >
               Scroll to explore
             </span>
+            <motion.svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="oklch(0.72 0.04 67.03 / 0.6)"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              animate={{ y: [0, 8, 0] }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <path d="M12 5v14M5 12l7 7 7-7" />
+            </motion.svg>
           </motion.div>
         </div>
       </div>
@@ -196,8 +221,8 @@ export default function LandingPage() {
       <motion.div
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-20"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 1 }}
+        animate={{ opacity: isTransitioning ? 0 : 1 }}
+        transition={{ delay: 1, duration: 0.3 }}
       >
         <div
           className="w-6 h-10 rounded-full flex justify-center overflow-hidden transition-all duration-200 ease-out relative"
@@ -236,6 +261,19 @@ export default function LandingPage() {
           />
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            key="transition-overlay"
+            className="fixed inset-0 z-50 origin-center"
+            style={{ background: "oklch(0.23 0.07 254.08)" }}
+            initial={{ scale: 1, opacity: 0 }}
+            animate={{ scale: 20, opacity: 1 }}
+            transition={{ duration: 1.0, ease: "easeIn" }}
+          />
+        )}
+      </AnimatePresence>
     </main>
   );
 }
