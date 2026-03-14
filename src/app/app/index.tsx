@@ -34,7 +34,7 @@ const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
 });
 
 export default function AppView() {
-  const { user, isAnonymous } = useSession();
+  const { user } = useSession();
 
   const [data, setData] = useState<GraphData>({
     nodes: INITIAL_NODES,
@@ -141,6 +141,12 @@ export default function AppView() {
     }
   }, [data.links, loading]);
 
+  const hasChildren = useCallback((nodeId: number): boolean => {
+    return data.links.some(
+      (link) => (link.source as Node).id === nodeId || link.source === nodeId
+    );
+  }, []);
+
   if (!user) {
     return;
   }
@@ -163,7 +169,7 @@ export default function AppView() {
           const textWidth = ctx.measureText(label).width;
           const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.2);
 
-          const nodeColor = loading === node.id ? '#ffd700' : COLORS[node.group % COLORS.length];
+          const nodeColor = loading === node.id ? '#ffd700' : hasChildren(node.id) ?  "oklch(0.6941 0.1233 238.24)" : "#FF0000";
 
           ctx.beginPath();
           ctx.arc(node.x, node.y, 5 + node.group, 0, 2 * Math.PI);
@@ -173,7 +179,7 @@ export default function AppView() {
           const showLabel = node.group <= 1 || globalScale > 1.5;
 
           if (showLabel) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0)';
             ctx.fillRect(
               node.x - bckgDimensions[0] / 2,
               node.y - bckgDimensions[1] / 2 - 10,
@@ -182,7 +188,7 @@ export default function AppView() {
 
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = '#000';
+            ctx.fillStyle = 'oklch(0.7735 0.0962 57.72)';
             ctx.fillText(label, node.x, node.y - 10);
           }
 
@@ -196,7 +202,7 @@ export default function AppView() {
         }}
         linkDirectionalArrowLength={0}
         linkDirectionalArrowRelPos={1}
-        linkColor={() => '#FF0000'}
+        linkColor={() => 'oklch(0.7176 0.0691 57.72)'}
       />
       {loading !== null && (
         <div style={{

@@ -10,7 +10,6 @@ import { ConnectSupabaseSteps } from '@/components/tutorial/connect-supabase-ste
 import { SignUpUserSteps } from '@/components/tutorial/sign-up-user-steps'
 import { hasEnvVars } from '@/utils/env'
 
-
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center">
