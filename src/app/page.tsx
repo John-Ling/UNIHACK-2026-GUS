@@ -113,9 +113,8 @@ export default function LandingPage() {
           >
             novel, graph-based web exploration
           </motion.p>
-
           
-          <Button primary="true" onClick={() => { // eslint-disable-line no-console
+          <Button onClick={() => {
             setIsTransitioning(true);
             setTimeout(() => {
               router.push("/app");
