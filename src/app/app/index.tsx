@@ -334,7 +334,7 @@ export default function AppView() {
           }));
 
           fan();
-          
+
           handleGraphSave({
             nodes: [...prev.nodes, ...newNodes],
             links: [...prev.links, ...newLinks],
@@ -551,7 +551,7 @@ export default function AppView() {
           ctx.fill();
         }}
         d3AlphaDecay={0.02} // default 0.0228, lower = longer simulation
-        d3VelocityDecay={0.8} // default 0.4, lower = nodes travel further
+        d3VelocityDecay={0.6} // default 0.4, lower = nodes travel further
         linkDirectionalArrowLength={0}
         linkDirectionalArrowRelPos={1}
         linkColor={() => "oklch(0.7176 0.0691 57.72)"}
